@@ -14,9 +14,8 @@ pub extern crate stepper;
 pub extern crate tmc2209;
 
 pub mod implementation;
-pub mod reg_processor;
 pub mod structures;
-pub mod tmc2209_driver;
+pub mod traits;
 pub mod utils;
 
-pub use crate::tmc2209_driver::*;
+pub use crate::structures::driver::TMC2209UART;

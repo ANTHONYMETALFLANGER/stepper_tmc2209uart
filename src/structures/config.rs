@@ -1,36 +1,7 @@
-#![allow(non_camel_case_types)]
-#![allow(missing_docs)]
-
-//. Some values that are not sent to the driver, but are involved in the calculations
-pub struct TMC2209_BaseConfig {
-    /// You can connect multiple drivers to one uart (see tmc2209 datasheet, page 17, 18)
-    pub uart_address: u8,
-
-    /// Sense resistor (see tmc2209 datasheet, page 49)
-    pub r_sense: f32,
-
-    /// You can decrease hold current (in comparison to run current) with this multiplier
-    pub ihold_multiplier: f32,
-}
-
-/// All writable registers for the TMC2209.
-pub struct TMC2209_ConfigRegisters {
-    pub gconf: Option<tmc2209::reg::GCONF>,
-    pub chopconf: Option<tmc2209::reg::CHOPCONF>,
-    pub slaveconf: Option<tmc2209::reg::SLAVECONF>,
-    pub factory_conf: Option<tmc2209::reg::FACTORY_CONF>,
-    pub ihold_irun: Option<tmc2209::reg::IHOLD_IRUN>,
-    pub coolconf: Option<tmc2209::reg::COOLCONF>,
-    pub pwmconf: Option<tmc2209::reg::PWMCONF>,
-    pub tpowerdown: Option<tmc2209::reg::TPOWERDOWN>,
-    pub tpwmthrs: Option<tmc2209::reg::TPWMTHRS>,
-    pub sgthrs: Option<tmc2209::reg::SGTHRS>,
-    pub tcoolthrs: Option<tmc2209::reg::TCOOLTHRS>,
-}
-
-/// Full config of tmc2209.
+#[allow(non_camel_case_types)]
+/// Main high-level tmc driver configuration
 ///
-/// Possible usage:
+/// Usage example:
 /// ```
 /// let config = TMC2209_Config {
 ///     rms_current: Some(700), // 700 mA run current
@@ -85,18 +56,5 @@ pub struct TMC2209_Config {
     pub diss2vs: Option<bool>,
     pub fclktrim: Option<u8>,
     pub ottrim: Option<u8>,
-}
-
-pub struct TMC2209_ConfigRegistersChangesDetected {
-    pub gconf: bool,
-    pub chopconf: bool,
-    pub slaveconf: bool,
-    pub factory_conf: bool,
-    pub ihold_irun: bool,
-    pub coolconf: bool,
-    pub pwmconf: bool,
-    pub tpowerdown: bool,
-    pub tpwmthrs: bool,
-    pub sgthrs: bool,
-    pub tcoolthrs: bool,
+    pub shaft: Option<bool>,
 }

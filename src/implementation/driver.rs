@@ -1,5 +1,7 @@
 //! TMC2209UART Driver
 //!
+//! Here is implementation o basic stepper library traits
+//!
 //! Platform-agnostic driver API for the TMC2209UART stepper motor driver. Can be
 //! used on any platform for which implementations of the required
 //! [embedded-hal] and [embedded_io] traits are available.
@@ -17,25 +19,10 @@ use stepper::{
     },
 };
 
-use crate::structures::TMC2209_BaseConfig;
-pub mod tmc2209_impl;
-pub mod tmc2209_traits;
-pub mod read_write_config_registers;
-
-/// The TMC2209UART driver API
-///
-/// Users are not expected to use this API directly, except to create an
-/// instance using [`TMC2209UART::new`].
-pub struct TMC2209UART<Enable, Fault, Sleep, Reset, UartRef, Step, Dir> {
-    enable: Enable,
-    fault: Fault,
-    shared_uart: UartRef,
-    base_config: TMC2209_BaseConfig,
-    sleep: Sleep,
-    reset: Reset,
-    step: Step,
-    dir: Dir,
-}
+use crate::structures::{
+    base_config::TMC2209_BaseConfig, driver::TMC2209UART,
+    saved_config::TMC2209_SavedConfig,
+};
 
 impl TMC2209UART<(), (), (), (), (), (), ()> {
     /// Create a new instance of `TMC2209UART`
@@ -45,6 +32,7 @@ impl TMC2209UART<(), (), (), (), (), (), ()> {
             fault: (),
             shared_uart: (),
             base_config,
+            saved_config: TMC2209_SavedConfig::new(),
             sleep: (),
             reset: (),
             step: (),
@@ -71,6 +59,7 @@ where
             reset,
             shared_uart: self.shared_uart,
             base_config: self.base_config,
+            saved_config: self.saved_config,
             step: self.step,
             dir: self.dir,
         }
@@ -119,6 +108,7 @@ where
             reset: self.reset,
             shared_uart: self.shared_uart,
             base_config: self.base_config,
+            saved_config: self.saved_config,
             step: self.step,
             dir,
         }
@@ -157,6 +147,7 @@ where
             reset: self.reset,
             shared_uart: self.shared_uart,
             base_config: self.base_config,
+            saved_config: self.saved_config,
             step,
             dir: self.dir,
         }
