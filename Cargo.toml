@@ -1,0 +1,25 @@
+[package]
+name = "tmc2209_uart_stepper"
+version = "0.1.0"
+authors = ["Antounio Pauloretty <unchristed@gmail.com>"]
+
+description = "A high-level tmc2209 driver control interface based on the mitchmindtree/tmc2209 library and compatible with the stepper library"
+repository = "https://github.com/ANTHONYMETALFLANGER/tmc2209uart_stepper.git"
+license = "MIT"
+keywords = [
+    "stepper",
+    "motor",
+    "driver",
+    "abstract",
+    "interface",
+    "tmc2209",
+    "tmc",
+]
+categories = ["embedded", "hardware-support", "no-std", "science::robotics"]
+
+[dependencies]
+embedded-hal = "1.0.0"
+embedded-io = "0.6.1"
+stepper = { git = "https://github.com/hannobraun/stepper.git" }
+tmc2209 = { git = "https://github.com/mitchmindtree/tmc2209.git" }
+critical-section = "1.1.3"
