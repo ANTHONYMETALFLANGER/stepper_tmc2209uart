@@ -1,6 +1,6 @@
 # stepper_tmc2209uart
 
-A high-level tmc2209 driver control interface based on the mitchmindtree/tmc2209 library and compatible with the stepper library
+A high-level tmc2209 driver control interface based on the mitchmindtree/tmc2209 library and compatible with the hannobraun/stepper library
 
 ## Warning
 
@@ -14,5 +14,3 @@ See [LICENSE.md] for full details.
 
 [LICENSE.md]: LICENSE.md
 [@ANTHONYMETALFLANGER]: https://github.com/ANTHONYMETALFLANGER
-[@mitchmindtree]: https://github.com/mitchmindtree
-
