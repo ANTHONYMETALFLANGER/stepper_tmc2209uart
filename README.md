@@ -1,6 +1,10 @@
-# tmc2209uart_stepper
+# stepper_tmc2209uart
 
 A high-level tmc2209 driver control interface based on the mitchmindtree/tmc2209 library and compatible with the stepper library
+
+## Warning
+
+This is an experimental library at an early stage of development. I haven't had time to test it on real hardware yet
 
 ## License
 
@@ -9,5 +13,5 @@ This project is open source software, licensed under the terms of the [MIT Licen
 See [LICENSE.md] for full details.
 
 [LICENSE.md]: LICENSE.md
-[@hannobraun]: https://github.com/hannobraun
-[@jessebraham]: https://github.com/jessebraham
+[@ANTHONYMETALFLANGER]: https://github.com/ANTHONYMETALFLANGER
+[@mitchmindtree]: https://github.com/mitchmindtree
