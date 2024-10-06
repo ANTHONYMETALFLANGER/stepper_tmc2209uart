@@ -3,6 +3,8 @@
 
 use embedded_io::{Read, Write};
 
+use crate::structures::{TMC2209_Config, TMC2209_ConfigRegisters};
+
 // Read register (wait in while loop until response is received)
 pub fn read_reg_blocking<
     Reg: tmc2209::reg::ReadableRegister,

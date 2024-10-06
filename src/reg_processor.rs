@@ -1,6 +1,6 @@
 #![allow(missing_docs)]
-use super::structures::*;
-use super::utils::{
+use crate::structures::*;
+use crate::utils::{
     microstepps_to_mres, rms_current_to_ihold_irun_vsense,
     RmsCurrentToIholdIrunVsenseOutput as IholdIrunVsense,
 };
@@ -49,10 +49,6 @@ pub fn process_reg_config(
 
     if let Some(mut tpowerdown) = mutable_previous_regs.tpowerdown {
         process_tpowerdown(&mut tpowerdown, config);
-    }
-
-    if let Some(mut tstep) = mutable_previous_regs.tstep {
-        process_tstep(&mut tstep, config);
     }
 
     if let Some(mut tpwmthrs) = mutable_previous_regs.tpwmthrs {
@@ -284,12 +280,6 @@ pub fn process_tpowerdown(
 ) {
     if let Some(tpowerdown_val) = config.tpowerdown {
         tpowerdown.0 = tpowerdown_val;
-    }
-}
-
-pub fn process_tstep(tstep: &mut tmc2209::reg::TSTEP, config: &TMC2209_Config) {
-    if let Some(tstep_val) = config.tstep {
-        tstep.0 = tstep_val;
     }
 }
 

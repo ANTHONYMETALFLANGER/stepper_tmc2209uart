@@ -1,5 +1,5 @@
 #![allow(missing_docs)]
-use super::structures::{
+use crate::structures::{
     TMC2209_BaseConfig, TMC2209_Config, TMC2209_ConfigRegisters,
     TMC2209_ConfigRegistersChangesDetected,
 };
@@ -25,7 +25,6 @@ impl TMC2209_ConfigRegisters {
             coolconf: None,
             pwmconf: None,
             tpowerdown: None,
-            tstep: None,
             tpwmthrs: None,
             sgthrs: None,
             tcoolthrs: None,
@@ -39,16 +38,13 @@ impl TMC2209_ConfigRegistersChangesDetected {
             gconf: false,
             chopconf: false,
             slaveconf: false,
-            otp_prog: false,
             factory_conf: false,
             ihold_irun: false,
             coolconf: false,
             pwmconf: false,
             tpowerdown: false,
-            tstep: false,
             tpwmthrs: false,
             sgthrs: false,
-            vactual: false,
             tcoolthrs: false,
         }
     }
@@ -100,7 +96,6 @@ impl Default for TMC2209_Config {
             diss2vs: None,
             fclktrim: None,
             ottrim: None,
-            tstep: None,
         }
     }
 }
@@ -119,7 +114,6 @@ impl TMC2209_Config {
         changes.coolconf = is_coolconf_changed(self);
         changes.pwmconf = is_pwmconf_changed(self);
         changes.tpowerdown = is_tpowerdown_changed(self);
-        changes.tstep = is_tstep_changed(self);
         changes.tpwmthrs = is_tpwmthrs_changed(self);
         changes.sgthrs = is_sgthrs_changed(self);
         changes.tcoolthrs = is_tcoolthrs_changed(self);
@@ -184,10 +178,6 @@ fn is_pwmconf_changed(config: &TMC2209_Config) -> bool {
         || config.pwm_lim.is_some()
         || config.pwm_ofs.is_some()
         || config.pwm_reg.is_some()
-}
-
-fn is_tstep_changed(config: &TMC2209_Config) -> bool {
-    config.tstep.is_some()
 }
 
 fn is_tpowerdown_changed(config: &TMC2209_Config) -> bool {

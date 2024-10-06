@@ -4,14 +4,19 @@
 //! based on the mitchmindtree/tmc2209 library
 //! and compatible with the stepper library
 
-#![cfg_attr(not(test), no_std)]
-#![deny(missing_docs, rustdoc::broken_intra_doc_links)]
+#![no_std]
 
-pub mod driver;
+pub extern crate critical_section;
+pub extern crate embedded_hal;
+pub extern crate embedded_io;
+pub extern crate fugit;
+pub extern crate stepper;
+pub extern crate tmc2209;
+
 pub mod implementation;
 pub mod reg_processor;
 pub mod structures;
-pub mod traits;
+pub mod tmc2209_driver;
 pub mod utils;
 
-pub use self::driver::*;
+pub use crate::tmc2209_driver::*;

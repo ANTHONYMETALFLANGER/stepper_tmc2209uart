@@ -23,7 +23,6 @@ pub struct TMC2209_ConfigRegisters {
     pub coolconf: Option<tmc2209::reg::COOLCONF>,
     pub pwmconf: Option<tmc2209::reg::PWMCONF>,
     pub tpowerdown: Option<tmc2209::reg::TPOWERDOWN>,
-    pub tstep: Option<tmc2209::reg::TSTEP>,
     pub tpwmthrs: Option<tmc2209::reg::TPWMTHRS>,
     pub sgthrs: Option<tmc2209::reg::SGTHRS>,
     pub tcoolthrs: Option<tmc2209::reg::TCOOLTHRS>,
@@ -86,22 +85,18 @@ pub struct TMC2209_Config {
     pub diss2vs: Option<bool>,
     pub fclktrim: Option<u8>,
     pub ottrim: Option<u8>,
-    pub tstep: Option<u32>,
 }
 
 pub struct TMC2209_ConfigRegistersChangesDetected {
     pub gconf: bool,
     pub chopconf: bool,
     pub slaveconf: bool,
-    pub otp_prog: bool,
     pub factory_conf: bool,
     pub ihold_irun: bool,
     pub coolconf: bool,
     pub pwmconf: bool,
     pub tpowerdown: bool,
-    pub tstep: bool,
     pub tpwmthrs: bool,
     pub sgthrs: bool,
-    pub vactual: bool,
     pub tcoolthrs: bool,
 }

@@ -6,10 +6,10 @@
 
 use core::convert::Infallible;
 
-use embedded_hal::digital::{OutputPin, PinState};
+use embedded_hal::digital::OutputPin;
 use fugit::NanosDurationU32 as Nanoseconds;
 
-use crate::{
+use stepper::{
     step_mode::StepMode256,
     traits::{
         EnableDirectionControl, EnableStepControl, EnableStepModeControl,
@@ -17,36 +17,19 @@ use crate::{
     },
 };
 
-use super::tmc_specific::tmc2209uart_structures::{
-    TMC2209_BaseConfig, TMC2209_Config, TMC2209_ConfigRegisters,
-    TMC2209_ConfigRegistersChangesDetected,
-};
-use core::cell::RefCell;
-use critical_section::Mutex;
-use embedded_io::{Read, Write}; // Readable and Writable Uart
-
-use stepper::traits::{
-    EnableDirectionControl, EnableMotionControl, EnableStepControl,
-    EnableStepModeControl, SetDirection, SetStepMode, Step as StepTrait,
-};
+use crate::structures::TMC2209_BaseConfig;
+pub mod tmc2209_impl;
+pub mod tmc2209_traits;
+pub mod read_write_config_registers;
 
 /// The TMC2209UART driver API
 ///
 /// Users are not expected to use this API directly, except to create an
-/// instance using [`TMC2209UART::new`]. Please check out
-/// [`Stepper`](crate::Stepper) instead.
-///
-/// There is a `Uart` parameter here.
-/// You are supposed to use a special pettern to share Uart instance
-/// between different parts of the code (or tasks, interrupts)
-/// (see example: https://github.com/esp-rs/esp-hal/blob/main/examples/src/bin/serial_interrupts.rs).
-/// Basically the TMC2208UART structure just stores an immutable reference to
-/// `Mutex<RefCell<Option<Uart>>>` which is used to get a mutable reference to
-/// Uart inside critical_section::with() when needed
-pub struct TMC2209UART<'a, Enable, Fault, Sleep, Reset, Uart, Step, Dir> {
+/// instance using [`TMC2209UART::new`].
+pub struct TMC2209UART<Enable, Fault, Sleep, Reset, UartRef, Step, Dir> {
     enable: Enable,
     fault: Fault,
-    shared_uart: &'a Mutex<RefCell<Option<Uart>>>,
+    shared_uart: UartRef,
     base_config: TMC2209_BaseConfig,
     sleep: Sleep,
     reset: Reset,
@@ -54,19 +37,13 @@ pub struct TMC2209UART<'a, Enable, Fault, Sleep, Reset, Uart, Step, Dir> {
     dir: Dir,
 }
 
-impl<'a, Uart> TMC2209UART<'a, (), (), (), (), Uart, (), ()>
-where
-    Uart: Read + Write,
-{
+impl TMC2209UART<(), (), (), (), (), (), ()> {
     /// Create a new instance of `TMC2209UART`
-    pub fn new(
-        shared_uart: &'a Mutex<RefCell<Option<Uart>>>,
-        base_config: TMC2209_BaseConfig,
-    ) -> Self {
+    pub fn new_with_config(base_config: TMC2209_BaseConfig) -> Self {
         Self {
             enable: (),
             fault: (),
-            shared_uart,
+            shared_uart: (),
             base_config,
             sleep: (),
             reset: (),
@@ -76,14 +53,12 @@ where
     }
 }
 
-impl<'a, Reset, Uart, Step, Dir, OutputPinError> EnableStepModeControl<Reset>
-    for TMC2209UART<'a, (), (), (), (), Uart, Step, Dir>
+impl<Reset, Step, Dir, OutputPinError> EnableStepModeControl<Reset>
+    for TMC2209UART<(), (), (), (), (), Step, Dir>
 where
     Reset: OutputPin<Error = OutputPinError>,
-    Uart: Read<Error = OutputPinError> + Write<Error = OutputPinError>,
 {
-    type WithStepModeControl =
-        TMC2209UART<'a, (), (), (), Reset, Uart, Step, Dir>;
+    type WithStepModeControl = TMC2209UART<(), (), (), Reset, (), Step, Dir>;
 
     fn enable_step_mode_control(
         self,
@@ -102,11 +77,10 @@ where
     }
 }
 
-impl<'a, Reset, Uart, Step, Dir, OutputPinError> SetStepMode
-    for TMC2209UART<'a, (), (), (), Reset, Uart, Step, Dir>
+impl<Reset, Step, Dir, OutputPinError> SetStepMode
+    for TMC2209UART<(), (), (), Reset, (), Step, Dir>
 where
     Reset: OutputPin<Error = OutputPinError>,
-    Uart: Read<Error = OutputPinError> + Write<Error = OutputPinError>,
 {
     // Timing Requirements (page 6)
     // https://www.pololu.com/file/0J450/A4988.pdf
@@ -130,13 +104,12 @@ where
     }
 }
 
-impl<'a, Reset, Uart, Step, Dir, OutputPinError> EnableDirectionControl<Dir>
-    for TMC2209UART<'a, (), (), (), Reset, Uart, Step, ()>
+impl<Reset, Step, Dir, OutputPinError> EnableDirectionControl<Dir>
+    for TMC2209UART<(), (), (), Reset, (), Step, ()>
 where
     Dir: OutputPin<Error = OutputPinError>,
 {
-    type WithDirectionControl =
-        TMC2209UART<'a, (), (), (), Reset, Uart, Step, Dir>;
+    type WithDirectionControl = TMC2209UART<(), (), (), Reset, (), Step, Dir>;
 
     fn enable_direction_control(self, dir: Dir) -> Self::WithDirectionControl {
         TMC2209UART {
@@ -152,8 +125,8 @@ where
     }
 }
 
-impl<'a, Reset, Uart, Step, Dir, OutputPinError> SetDirection
-    for TMC2209UART<'a, (), (), (), Reset, Uart, Step, Dir>
+impl<Reset, Step, Dir, OutputPinError> SetDirection
+    for TMC2209UART<(), (), (), Reset, (), Step, Dir>
 where
     Dir: OutputPin<Error = OutputPinError>,
 {
@@ -169,12 +142,12 @@ where
     }
 }
 
-impl<'a, Reset, Uart, Step, Dir, OutputPinError> EnableStepControl<Step>
-    for TMC2209UART<'a, (), (), (), Reset, Uart, (), Dir>
+impl<Reset, Uart, Step, Dir, OutputPinError> EnableStepControl<Step>
+    for TMC2209UART<(), (), (), Reset, Uart, (), Dir>
 where
     Step: OutputPin<Error = OutputPinError>,
 {
-    type WithStepControl = TMC2209UART<'a, (), (), (), Reset, Uart, Step, Dir>;
+    type WithStepControl = TMC2209UART<(), (), (), Reset, Uart, Step, Dir>;
 
     fn enable_step_control(self, step: Step) -> Self::WithStepControl {
         TMC2209UART {
@@ -190,8 +163,8 @@ where
     }
 }
 
-impl<'a, Reset, Uart, Step, Dir, OutputPinError> StepTrait
-    for TMC2209UART<'a, (), (), (), Reset, Uart, Step, Dir>
+impl<Reset, Uart, Step, Dir, OutputPinError> StepTrait
+    for TMC2209UART<(), (), (), Reset, Uart, Step, Dir>
 where
     Step: OutputPin<Error = OutputPinError>,
 {
