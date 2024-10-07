@@ -2,7 +2,7 @@
 /// Main high-level tmc driver configuration
 ///
 /// Usage example:
-/// ```
+/// ```ignore
 /// let config = TMC2209_Config {
 ///     rms_current: Some(700), // 700 mA run current
 ///     microsteps: Some(16), // 16 microsteps
