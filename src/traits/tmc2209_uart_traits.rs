@@ -8,13 +8,13 @@ use embedded_io::{Read, Write};
 
 /// Enable TMC2209 controll trough uart
 pub trait EnableTMC2209UartControl<'a, Uart: Read + Write> {
-    // Uart type
+    // Uart mutex ref type
     type UartRef;
 
-    /// The type of the driver after microstepping mode control has been enabled
+    /// The type of the driver after uart control has been enabled
     type WithUartControl: TMC2209UartControl;
 
-    /// Enable microstepping mode control
+    /// Enable uart control
     fn enable_uart_control(
         self,
         uart: &'a Mutex<RefCell<Option<Uart>>>,
