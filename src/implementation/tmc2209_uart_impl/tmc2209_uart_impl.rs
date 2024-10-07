@@ -3,28 +3,27 @@ use super::config_read_write_methods::{
     set_vactual, write_registers_changed_in_config,
 };
 use super::reg_processor::process_reg_config;
-use crate::structures::{
-    config::TMC2209_Config, debug_readed_config::TMC2209_DebugConfig,
-    driver::TMC2209UART,
-};
-use crate::traits::tmc2209_uart_traits::{
-    EnableTMC2209UartControl, TMC2209UartControl,
+
+use crate::{
+    structures::{
+        config::TMC2209_Config, debug_readed_config::TMC2209_DebugConfig,
+    },
+    traits::tmc2209_uart_traits::{
+        EnableTMC2209UartControl, TMC2209UartControl,
+    },
+    TMC2209UART,
 };
 use core::cell::RefCell;
 use critical_section::Mutex;
-use embedded_hal::digital::OutputPin;
 use embedded_io::{Read, Write};
 
-impl<'a, Reset, Uart, Step, Dir, OutputPinError>
-    EnableTMC2209UartControl<'a, Uart>
-    for TMC2209UART<(), (), (), Reset, (), Step, Dir>
+impl<'a, Uart, OutputPinError> EnableTMC2209UartControl<'a, Uart>
+    for TMC2209UART<(), (), (), (), (), (), ()>
 where
-    Reset: OutputPin<Error = OutputPinError>,
     Uart: Read<Error = OutputPinError> + Write<Error = OutputPinError> + 'a,
 {
     type UartRef = &'a Mutex<RefCell<Option<Uart>>>; // Reference to uart mutex
-    type WithUartControl =
-        TMC2209UART<(), (), (), Reset, Self::UartRef, Step, Dir>; // UartUartRef, Step, Dir>;
+    type WithUartControl = TMC2209UART<(), (), (), (), Self::UartRef, (), ()>; // UartUartRef, Step, Dir>;
 
     /// There is a `uart: &'a Mutex<RefCell<Option<Uart>>>` parameter here.
     /// You are supposed to use a special pettern to share Uart instance
@@ -54,16 +53,8 @@ where
     }
 }
 
-impl<'a, Reset, Uart, Step, Dir, OutputPinError> TMC2209UartControl
-    for TMC2209UART<
-        (),
-        (),
-        (),
-        Reset,
-        &'a Mutex<RefCell<Option<Uart>>>,
-        Step,
-        Dir,
-    >
+impl<'a, Uart, OutputPinError> TMC2209UartControl
+    for TMC2209UART<(), (), (), (), &'a Mutex<RefCell<Option<Uart>>>, (), ()>
 where
     Uart: Read<Error = OutputPinError> + Write<Error = OutputPinError>,
 {
@@ -105,7 +96,7 @@ where
                         );
                     }
 
-                    // Config writed succesful, save it 
+                    // Config writed succesful, save it
                     self.saved_config = config_for_save;
                     Ok(())
                 })

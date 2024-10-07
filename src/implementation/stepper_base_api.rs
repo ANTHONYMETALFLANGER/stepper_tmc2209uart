@@ -19,13 +19,15 @@ use stepper::{
     },
 };
 
-use crate::structures::{
-    base_config::TMC2209_BaseConfig, driver::TMC2209UART,
-    saved_config::TMC2209_SavedConfig,
+use crate::{
+    structures::{
+        base_config::TMC2209_BaseConfig, saved_config::TMC2209_SavedConfig,
+    },
+    TMC2209UART,
 };
 
 impl TMC2209UART<(), (), (), (), (), (), ()> {
-    /// Create a new instance of `TMC2209UART`
+    /// Create a new instance of `TMC2209UART` with basic config
     pub fn new_with_config(base_config: TMC2209_BaseConfig) -> Self {
         Self {
             enable: (),

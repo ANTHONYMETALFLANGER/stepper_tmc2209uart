@@ -18,4 +18,22 @@ pub mod structures;
 pub mod traits;
 pub mod utils;
 
-pub use crate::structures::driver::TMC2209UART;
+use crate::structures::{
+    base_config::TMC2209_BaseConfig, saved_config::TMC2209_SavedConfig,
+};
+
+/// The TMC2209UART driver API
+///
+/// Users are not expected to use this API directly, except to create an
+/// instance using [`TMC2209UART::new_with_config`].
+pub struct TMC2209UART<Enable, Fault, Sleep, Reset, UartRef, Step, Dir> {
+    enable: Enable,
+    fault: Fault,
+    shared_uart: UartRef,
+    base_config: TMC2209_BaseConfig,
+    saved_config: TMC2209_SavedConfig,
+    sleep: Sleep,
+    reset: Reset,
+    step: Step,
+    dir: Dir,
+}
