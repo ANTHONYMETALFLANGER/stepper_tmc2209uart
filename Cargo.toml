@@ -1,5 +1,5 @@
 [package]
-name = "tmc2209_uart_stepper"
+name = "stepper_tmc2209uart"
 version = "0.1.0"
 authors = ["Antounio Pauloretty <unchristed@gmail.com>"]
 
