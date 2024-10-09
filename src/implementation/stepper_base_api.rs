@@ -9,6 +9,7 @@
 use core::convert::Infallible;
 
 use embedded_hal::digital::OutputPin;
+use embedded_io::{Read, Write};
 use fugit::NanosDurationU32 as Nanoseconds;
 
 use stepper::{
@@ -43,12 +44,12 @@ impl TMC2209UART<(), (), (), (), (), (), ()> {
     }
 }
 
-impl<Reset, Step, Dir, OutputPinError> EnableStepModeControl<Reset>
-    for TMC2209UART<(), (), (), (), (), Step, Dir>
+impl<Reset, Step, Dir, Uart, OutputPinError> EnableStepModeControl<Reset>
+    for TMC2209UART<(), (), (), (), Uart, Step, Dir>
 where
     Reset: OutputPin<Error = OutputPinError>,
 {
-    type WithStepModeControl = TMC2209UART<(), (), (), Reset, (), Step, Dir>;
+    type WithStepModeControl = TMC2209UART<(), (), (), Reset, Uart, Step, Dir>;
 
     fn enable_step_mode_control(
         self,
@@ -68,8 +69,8 @@ where
     }
 }
 
-impl<Reset, Step, Dir, OutputPinError> SetStepMode
-    for TMC2209UART<(), (), (), Reset, (), Step, Dir>
+impl<Reset, Step, Dir, Uart, OutputPinError> SetStepMode
+    for TMC2209UART<(), (), (), Reset, Uart, Step, Dir>
 where
     Reset: OutputPin<Error = OutputPinError>,
 {
@@ -95,12 +96,12 @@ where
     }
 }
 
-impl<Reset, Step, Dir, OutputPinError> EnableDirectionControl<Dir>
-    for TMC2209UART<(), (), (), Reset, (), Step, ()>
+impl<Reset, Step, Dir, Uart, OutputPinError> EnableDirectionControl<Dir>
+    for TMC2209UART<(), (), (), Reset, Uart, Step, ()>
 where
     Dir: OutputPin<Error = OutputPinError>,
 {
-    type WithDirectionControl = TMC2209UART<(), (), (), Reset, (), Step, Dir>;
+    type WithDirectionControl = TMC2209UART<(), (), (), Reset, Uart, Step, Dir>;
 
     fn enable_direction_control(self, dir: Dir) -> Self::WithDirectionControl {
         TMC2209UART {
@@ -117,8 +118,8 @@ where
     }
 }
 
-impl<Reset, Step, Dir, OutputPinError> SetDirection
-    for TMC2209UART<(), (), (), Reset, (), Step, Dir>
+impl<Reset, Step, Dir, Uart, OutputPinError> SetDirection
+    for TMC2209UART<(), (), (), Reset, Uart, Step, Dir>
 where
     Dir: OutputPin<Error = OutputPinError>,
 {
