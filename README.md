@@ -51,6 +51,10 @@ fn main() -> ! {
         ..Default::default()
     };
     let mut tmc_driver = TMC2209UART::new(&SERIAL, base_config);
+    let is_connected = tmc_driver.test_connection();
+    if !is_connected {
+        panic!("Tmc2209 not connected");
+    }
 
     // Now you can provide detailed configuration to TMC2209 driver using tmc_driver.apply_config()
     // Most of the field names in the config structure are similar to those in the TMCStepper library
@@ -62,18 +66,24 @@ fn main() -> ! {
         sgthrs: Some(120), // can be used for sensorless homing
         ..Default::default()
     };
-    let result = tmc_driver1.apply_config(&tmc_config);
+    let result = tmc_driver1.apply_config(&config);
     match result {
         Ok(_) => {log::info!("Tmc2209 config applied");}
-        Err(_) => {log::info!("Something went wrong!");}
+        Err(_) => {panic!("Something went wrong!");}
     }
 
     // We can get curent configuration using get_saved_config()
     let saved_config = tmc_driver1.get_saved_config();
+    log::info!("{}", saved_config.microsteps == config.microsteps.unwrap());
+
+    // We can also read SG_RESULT, invert shaft, move motor using vactual.
+    tmc_driver1.vactual(1000).unwrap();
+    tmc_driver1.set_shaft(true).unwrap();
+    tmc_driver1.shaft().unwrap(); // Inverts shaft
+    log::info!("{}", tmc_driver1.read_sg_result().unwrap());
 
 }
 ```
-
 
 ## License
 
