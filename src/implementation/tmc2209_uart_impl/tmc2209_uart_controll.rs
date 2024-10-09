@@ -2,7 +2,8 @@ use core::cell::RefCell;
 
 use super::config_read_write_methods::{
     debug_read_config_from_driver, get_registers_changed_in_config,
-    read_sg_result, set_vactual, write_registers_changed_in_config,
+    read_sg_result, set_vactual, test_connection,
+    write_registers_changed_in_config,
 };
 use super::reg_processor::process_reg_config;
 
@@ -37,9 +38,17 @@ impl<'a, Uart: Read + Write> TMC2209UART<'a, Uart> {
             base_config,
             saved_config: TMC2209_SavedConfig::new(),
         }
-    
     }
 
+    /// Load readable registers from driver and save it in saved_config
+    pub fn init_saved_config(&mut self) -> Result<(), ()> {
+        let debug_config = self.debug_read_config_from_driver()?;
+        self.saved_config =
+            TMC2209_SavedConfig::new_from_debug_config(&debug_config);
+        Ok(())
+    }
+
+    /// Send TMC2209_Config to driver
     pub fn apply_config(&mut self, config: &TMC2209_Config) -> Result<(), ()> {
         // Read registers changed by config
         let mut ready_registers = critical_section::with(|cs| {
@@ -87,6 +96,7 @@ impl<'a, Uart: Read + Write> TMC2209UART<'a, Uart> {
         }
     }
 
+    /// Read config directly from driver (Not all registers can be readed)
     pub fn debug_read_config_from_driver(
         &mut self,
     ) -> Result<TMC2209_DebugConfig, ()> {
@@ -103,6 +113,7 @@ impl<'a, Uart: Read + Write> TMC2209UART<'a, Uart> {
         })
     }
 
+    /// Move motor to v_actual steps
     pub fn vactual(&mut self, v_actual: i32) -> Result<(), ()> {
         critical_section::with(|cs| {
             let mut uart_cell = self.shared_uart.borrow(cs).borrow_mut();
@@ -114,6 +125,7 @@ impl<'a, Uart: Read + Write> TMC2209UART<'a, Uart> {
         })
     }
 
+    /// Set motor direction
     pub fn set_shaft(&mut self, shaft: bool) -> Result<(), ()> {
         let config = TMC2209_Config {
             shaft: Some(shaft),
@@ -122,6 +134,7 @@ impl<'a, Uart: Read + Write> TMC2209UART<'a, Uart> {
         self.apply_config(&config)
     }
 
+    /// Invert motor direction
     pub fn shaft(&mut self) -> Result<(), ()> {
         let config = TMC2209_Config {
             shaft: Some(!self.saved_config.shaft),
@@ -130,11 +143,32 @@ impl<'a, Uart: Read + Write> TMC2209UART<'a, Uart> {
         self.apply_config(&config)
     }
 
+    /// Read SG_RESULT
     pub fn read_sg_result(&mut self) -> Result<u16, ()> {
-        read_sg_result(self.shared_uart, self.base_config.uart_address)
+        critical_section::with(|cs| {
+            let mut uart_cell = self.shared_uart.borrow(cs).borrow_mut();
+            if let Some(uart) = uart_cell.as_mut() {
+                read_sg_result(uart, self.base_config.uart_address)
+            } else {
+                return Err(());
+            }
+        })
     }
 
+    /// Get saved config
     pub fn get_saved_config(&self) -> &TMC2209_SavedConfig {
         &self.saved_config
+    }
+
+    /// Test connect to TMC2209. Returns true if connection was succesful
+    pub fn test_connection(&self) -> bool {
+        critical_section::with(|cs| {
+            let mut uart_cell = self.shared_uart.borrow(cs).borrow_mut();
+            if let Some(uart) = uart_cell.as_mut() {
+                test_connection(uart, self.base_config.uart_address)
+            } else {
+                return false;
+            }
+        })
     }
 }

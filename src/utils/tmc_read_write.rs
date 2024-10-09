@@ -34,11 +34,14 @@ pub fn read_reg_blocking<
     return Err(());
 }
 
-pub fn test_connection<Uart: Read + Write>(
+pub fn test_uart_connection<Uart: Read + Write>(
     uart: &mut Uart,
     uart_address: u8,
 ) -> bool {
-    let result = tmc2209::send_read_request::<tmc2209::reg::DRV_STATUS, _>(uart_address, uart);
+    let result = tmc2209::send_read_request::<tmc2209::reg::DRV_STATUS, _>(
+        uart_address,
+        uart,
+    );
     if result.is_err() {
         return false;
     }
@@ -50,7 +53,9 @@ pub fn test_connection<Uart: Read + Write>(
         if let (_, Some(response)) = reader.read_response(&buff) {
             if response.crc_is_valid() {
                 if let Ok(addr) = response.reg_addr() {
-                    if addr == tmc2209::reg::Address::DRV_STATUS {return true}
+                    if addr == tmc2209::reg::Address::DRV_STATUS {
+                        return true;
+                    }
                 }
             }
         }
@@ -70,4 +75,3 @@ pub fn write_reg<Reg: tmc2209::reg::WritableRegister, Uart: Read + Write>(
     }
     Ok(())
 }
-

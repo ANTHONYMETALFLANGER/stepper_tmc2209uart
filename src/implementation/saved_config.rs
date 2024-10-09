@@ -1,4 +1,6 @@
-use crate::structures::saved_config::TMC2209_SavedConfig;
+use crate::structures::{
+    debug_readed_config::TMC2209_DebugConfig, saved_config::TMC2209_SavedConfig,
+};
 
 impl TMC2209_SavedConfig {
     /// Create new TMC2209_SavedConfig with "empty" values
@@ -47,45 +49,47 @@ impl TMC2209_SavedConfig {
             senddelay: 0,
         }
     }
-    
+
     /// Creates saved config using values from TMC2209 driver
-    pub fn new() -> TMC2209_SavedConfig {
+    pub fn new_from_debug_config(
+        debug_config: &TMC2209_DebugConfig,
+    ) -> TMC2209_SavedConfig {
         TMC2209_SavedConfig {
             rms_current: 0,
             ihold_delay: 0,
-            microsteps: 0,
-            interpolation: false,
-            blank_time: 0,
-            hysteresis_end: 0,
-            hysteresis_start: 0,
+            microsteps: debug_config.microsteps,
+            interpolation: debug_config.interpolation,
+            blank_time: debug_config.blank_time,
+            hysteresis_end: debug_config.hysteresis_end,
+            hysteresis_start: debug_config.hysteresis_start,
             tpowerdown: 0,
             tpwmthrs: 0,
             sgthrs: 0,
             tcoolthrs: 0,
-            en_spreadcycle: false,
-            pdn_disable: false,
-            pwm_ofs: 0,
-            pwm_grad: 0,
-            pwm_freq: 0,
-            pwm_autoscale: false,
-            pwm_autograd: false,
-            pwm_reg: 0,
-            pwm_lim: 0,
-            freewheel: 0,
-            internal_rsense: false,
-            i_scale_analog: false,
-            mstep_reg_select: false,
-            multistep_filt: false,
-            index_otpw: false,
-            index_step: false,
-            toff: 0,
-            vsense: false,
-            dedge: false,
-            diss2g: false,
-            diss2vs: false,
-            fclktrim: 0,
-            ottrim: 0,
-            shaft: false,
+            en_spreadcycle: debug_config.en_spreadcycle,
+            pdn_disable: debug_config.pdn_disable,
+            pwm_ofs: debug_config.pwm_ofs,
+            pwm_grad: debug_config.pwm_grad,
+            pwm_freq: debug_config.pwm_freq,
+            pwm_autoscale: debug_config.pwm_autoscale,
+            pwm_autograd: debug_config.pwm_autograd,
+            pwm_reg: debug_config.pwm_reg,
+            pwm_lim: debug_config.pwm_lim,
+            freewheel: debug_config.freewheel,
+            internal_rsense: debug_config.internal_rsense,
+            i_scale_analog: debug_config.i_scale_analog,
+            mstep_reg_select: debug_config.mstep_reg_select,
+            multistep_filt: debug_config.multistep_filt,
+            index_otpw: debug_config.index_otpw,
+            index_step: debug_config.index_step,
+            toff: debug_config.toff,
+            vsense: debug_config.vsense,
+            dedge: debug_config.dedge,
+            diss2g: debug_config.diss2g,
+            diss2vs: debug_config.diss2vs,
+            fclktrim: debug_config.fclktrim,
+            ottrim: debug_config.ottrim,
+            shaft: debug_config.shaft,
             seimin: false,
             sedn: 0,
             seup: 0,

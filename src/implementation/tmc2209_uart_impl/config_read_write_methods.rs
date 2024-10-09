@@ -4,6 +4,7 @@ use crate::structures::{
 };
 use crate::utils::{
     calc::mres_to_microsteps,
+    tmc_read_write::test_uart_connection,
     tmc_read_write::{read_reg_blocking, write_reg},
 };
 use core::cell::RefCell;
@@ -177,42 +178,22 @@ pub fn write_registers_changed_in_config<'a, Uart: Read + Write>(
     Ok(())
 }
 
-pub fn read_sg_result<Uart: Read + Write>(
-    uart: &Mutex<RefCell<Option<Uart>>>,
+pub fn read_sg_result<'a, Uart: Read + Write>(
+    uart: &'a mut Uart,
     uart_address: u8,
 ) -> Result<u16, ()> {
-    critical_section::with(|cs| {
-        let mut uart_cell = uart.borrow(cs).borrow_mut();
-        if let Some(uart) = uart_cell.as_mut() {
-            return Ok(read_reg_blocking::<tmc2209::reg::SG_RESULT, _>(
-                uart,
-                uart_address,
-            )
-            .unwrap()
-            .get());
-        } else {
-            return Err(());
-        }
-    })
+    return Ok(read_reg_blocking::<tmc2209::reg::SG_RESULT, _>(
+        uart,
+        uart_address,
+    )?
+    .get());
 }
 
-pub fn read_drv_status<Uart: Read + Write>(
-    uart: &Mutex<RefCell<Option<Uart>>>,
+pub fn test_connection<'a, Uart: Read + Write>(
+    uart: &'a mut Uart,
     uart_address: u8,
-) -> Result<u16, ()> {
-    critical_section::with(|cs| {
-        let mut uart_cell = uart.borrow(cs).borrow_mut();
-        if let Some(uart) = uart_cell.as_mut() {
-            return Ok(read_reg_blocking::<tmc2209::reg::DRV_STATUS, _>(
-                uart,
-                uart_address,
-            )
-            .unwrap()
-            .);
-        } else {
-            return Err(());
-        }
-    })
+) -> bool {
+    return test_uart_connection(uart, uart_address);
 }
 
 pub fn set_vactual<Uart: Read + Write>(
