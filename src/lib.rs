@@ -10,8 +10,6 @@
 pub extern crate critical_section;
 pub extern crate embedded_hal;
 pub extern crate embedded_io;
-pub extern crate fugit;
-pub extern crate stepper;
 pub extern crate tmc2209;
 
 pub mod implementation;
