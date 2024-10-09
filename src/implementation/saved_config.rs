@@ -47,4 +47,51 @@ impl TMC2209_SavedConfig {
             senddelay: 0,
         }
     }
+    
+    /// Creates saved config using values from TMC2209 driver
+    pub fn new() -> TMC2209_SavedConfig {
+        TMC2209_SavedConfig {
+            rms_current: 0,
+            ihold_delay: 0,
+            microsteps: 0,
+            interpolation: false,
+            blank_time: 0,
+            hysteresis_end: 0,
+            hysteresis_start: 0,
+            tpowerdown: 0,
+            tpwmthrs: 0,
+            sgthrs: 0,
+            tcoolthrs: 0,
+            en_spreadcycle: false,
+            pdn_disable: false,
+            pwm_ofs: 0,
+            pwm_grad: 0,
+            pwm_freq: 0,
+            pwm_autoscale: false,
+            pwm_autograd: false,
+            pwm_reg: 0,
+            pwm_lim: 0,
+            freewheel: 0,
+            internal_rsense: false,
+            i_scale_analog: false,
+            mstep_reg_select: false,
+            multistep_filt: false,
+            index_otpw: false,
+            index_step: false,
+            toff: 0,
+            vsense: false,
+            dedge: false,
+            diss2g: false,
+            diss2vs: false,
+            fclktrim: 0,
+            ottrim: 0,
+            shaft: false,
+            seimin: false,
+            sedn: 0,
+            seup: 0,
+            semax: 0,
+            semin: 0,
+            senddelay: 0,
+        }
+    }
 }

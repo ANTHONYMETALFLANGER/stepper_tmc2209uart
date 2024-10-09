@@ -196,6 +196,25 @@ pub fn read_sg_result<Uart: Read + Write>(
     })
 }
 
+pub fn read_drv_status<Uart: Read + Write>(
+    uart: &Mutex<RefCell<Option<Uart>>>,
+    uart_address: u8,
+) -> Result<u16, ()> {
+    critical_section::with(|cs| {
+        let mut uart_cell = uart.borrow(cs).borrow_mut();
+        if let Some(uart) = uart_cell.as_mut() {
+            return Ok(read_reg_blocking::<tmc2209::reg::DRV_STATUS, _>(
+                uart,
+                uart_address,
+            )
+            .unwrap()
+            .);
+        } else {
+            return Err(());
+        }
+    })
+}
+
 pub fn set_vactual<Uart: Read + Write>(
     uart: &mut Uart,
     uart_address: u8,

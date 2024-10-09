@@ -1,9 +1,12 @@
+use core::cell::RefCell;
+
 use super::config_read_write_methods::{
     debug_read_config_from_driver, get_registers_changed_in_config,
     read_sg_result, set_vactual, write_registers_changed_in_config,
 };
 use super::reg_processor::process_reg_config;
 
+use crate::structures::base_config::TMC2209_BaseConfig;
 use crate::{
     structures::{
         config::TMC2209_Config, debug_readed_config::TMC2209_DebugConfig,
@@ -11,9 +14,32 @@ use crate::{
     },
     TMC2209UART,
 };
+use critical_section::Mutex;
 use embedded_io::{Read, Write};
 
 impl<'a, Uart: Read + Write> TMC2209UART<'a, Uart> {
+    /// There is a `uart: &'a Mutex<RefCell<Option<Uart>>>` parameter here.
+    /// You are supposed to use a special pettern to share Uart instance
+    /// between different parts of the code (usually tasks, interrupts)
+    /// (see example: https://github.com/esp-rs/esp-hal/blob/main/examples/src/bin/serial_interrupts.rs).
+    /// Basically the TMC2208UART structure just stores an immutable reference to
+    /// `Mutex<RefCell<Option<Uart>>>` which is used to get a mutable reference to
+    /// Uart inside critical_section::with() when needed
+    ///
+    /// This decision was made because of the need to create
+    /// several TMC2209UART instances that must have mutable access to one uart
+    pub fn new(
+        shared_uart: &'a Mutex<RefCell<Option<Uart>>>,
+        base_config: TMC2209_BaseConfig,
+    ) -> Self {
+        Self {
+            shared_uart,
+            base_config,
+            saved_config: TMC2209_SavedConfig::new(),
+        }
+    
+    }
+
     pub fn apply_config(&mut self, config: &TMC2209_Config) -> Result<(), ()> {
         // Read registers changed by config
         let mut ready_registers = critical_section::with(|cs| {
