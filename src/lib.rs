@@ -5,6 +5,7 @@
 //! and compatible with the stepper library
 
 #![no_std]
+#![allow(dead_code)]
 
 pub extern crate critical_section;
 pub extern crate embedded_hal;
@@ -21,19 +22,16 @@ pub mod utils;
 use crate::structures::{
     base_config::TMC2209_BaseConfig, saved_config::TMC2209_SavedConfig,
 };
+use core::cell::RefCell;
+use critical_section::Mutex;
+use embedded_io::{Read, Write};
 
 /// The TMC2209UART driver API
 ///
 /// Users are not expected to use this API directly, except to create an
-/// instance using [`TMC2209UART::new_with_config`].
-pub struct TMC2209UART<Enable, Fault, Sleep, Reset, UartRef, Step, Dir> {
-    enable: Enable,
-    fault: Fault,
-    shared_uart: UartRef,
+/// instance using [`TMC2209UART::new`].
+pub struct TMC2209UART<'a, Uart: Read + Write> {
+    shared_uart: &'a Mutex<RefCell<Option<Uart>>>,
     base_config: TMC2209_BaseConfig,
     saved_config: TMC2209_SavedConfig,
-    sleep: Sleep,
-    reset: Reset,
-    step: Step,
-    dir: Dir,
 }

@@ -1,4 +1,5 @@
 #[allow(non_camel_case_types)]
+#[derive(Clone)]
 /// When apply_config() called values of user config will be
 /// saved in this struct in case of succes send
 pub struct TMC2209_SavedConfig {
