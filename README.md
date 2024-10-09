@@ -81,7 +81,6 @@ fn main() -> ! {
     tmc_driver1.set_shaft(true).unwrap();
     tmc_driver1.shaft().unwrap(); // Inverts shaft
     log::info!("{}", tmc_driver1.read_sg_result().unwrap());
-
 }
 ```
 
