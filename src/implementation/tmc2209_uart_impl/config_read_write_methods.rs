@@ -7,8 +7,6 @@ use crate::utils::{
     tmc_read_write::test_uart_connection,
     tmc_read_write::{read_reg_blocking, write_reg},
 };
-use core::cell::RefCell;
-use critical_section::Mutex;
 use embedded_io::{Read, Write};
 
 pub fn get_registers_changed_in_config<'a, Uart: Read + Write>(
