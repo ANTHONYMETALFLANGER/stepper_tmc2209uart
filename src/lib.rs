@@ -14,7 +14,6 @@ pub extern crate tmc2209;
 
 pub mod implementation;
 pub mod structures;
-pub mod traits;
 pub mod utils;
 
 use crate::structures::{
