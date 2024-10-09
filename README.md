@@ -1,4 +1,4 @@
-# stepper_tmc2209uart
+# tmc2209uart
 
 A high-level tmc2209 uart control interface based on the mitchmindtree/tmc2209
 
@@ -22,17 +22,19 @@ pub static SERIAL: Mutex<RefCell<Option<Uart<UART2, Blocking>>>> = Mutex::new(Re
 ```
 
 tmc2209uart structs we are going to use
+
 ```rust
 use tmc2209uart::{
-    TMC2209UART, 
+    TMC2209UART,
     structures::{
-        base_config::TMC2209_BaseConfig, 
+        base_config::TMC2209_BaseConfig,
         saved_config::TMC2209_SavedConfig,
         }
 };
 ```
 
 Use TMC2209UART
+
 ```rust
 #[entry]
 fn main() -> ! {
