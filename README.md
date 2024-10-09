@@ -32,7 +32,7 @@ use tmc2209uart::{
 };
 ```
 
-Construct TMC2209UART
+Use TMC2209UART
 ```rust
 #[entry]
 fn main() -> ! {
